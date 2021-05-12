@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.smbms.mapper.Smbms_providerMapper">
+    <select id="getCount" resultType="int">
+        select count(*) from smbms_provider
+    </select>
+    <select id="getList" resultType="com.smbms.entity.Provider">
+             SELECT * FROM smbms_provider
+             <trim prefix="where" prefixOverrides="AND">
+             <choose>
+                 <when test="proCode != null and proCode != ''">proCode LIKE "%"#{proCode}"%"</when>
+                 <when test="proName != null and proName != ''">AND proName LIKE "%"#{proName}"%"</when>
+                 <when test="proContact != null and proContact != ''">AND proContact LIKE "%"#{proContact}"%"</when>
+                 <when test="creationDate != null and creationDate != ''">AND creationDate>=#{creationDate}</when>
+             </choose>
+             </trim>
+    </select>
+    <select id="getById" resultType="com.smbms.entity.Provider">
+        select * from smbms_provider
+        <trim prefix="where">
+            <if test="id!=null">
+                id=#{id}
+            </if>
+        </trim>
+        order by id DESC
+    </select>
+    <insert id="add">
+        insert into smbms_provider (id,proCode,proName,proDesc,proContact,proPhone,
+                                    proAddress,proFax,createdBy,creationDate,modifyDate,modifyBy)
+                    values (#{id},#{proCode},#{proName},#{proDesc},#{proContact},#{proPhone},
+                                    #{proAddress},#{proFax},#{createdBy},#{creationDate},#{modifyDate},#{modifyBy})
+    </insert>
+    <update id="update">
+        update smbms_provider
+        <trim prefix="set" suffixOverrides="," suffix="where id=#{id}">
+            <if test="proCode != null">proCode=#{proCode},</if>
+            <if test="proName != null">proName=#{proName},</if>
+            <if test="proDesc != null">proDesc=#{proDesc},</if>
+            <if test="proContact != null">proContact=#{proContact},</if>
+            <if test="proPhone != null">proPhone=#{proPhone},</if>
+            <if test="proAddress != null">proAddress=#{proAddress},</if>
+            <if test="proFax != null">proFax=#{proFax},</if>
+            <if test="createdBy != null">createdBy=#{createdBy},</if>
+            <if test="creationDate != null">creationDate=#{creationDate},</if>
+            <if test="modifyDate != null">modifyDate=#{modifyDate},</if>
+            <if test="modifyBy != null">modifyBy=#{modifyBy}</if>
+        </trim>
+    </update>
+    <delete id="del">
+        delete from smbms_provider where id=#{id}
+    </delete>
+
+
+
+    <resultMap id="pro" type="com.smbms.entity.Provider">
+        <collection property="billList" ofType="com.smbms.entity.Bill">
+            <result column="billCode" property="billCode"/>
+            <result column="productName" property="productName"/>
+            <result column="totalPrice" property="totalPrice"/>
+            <result column="isPayment" property="isPayment"/>
+        </collection>
+    </resultMap>
+    <select id="getById2" resultMap="pro">
+        SELECT a2.id,a2.proCode,a2.proName,a2.proContact,a2.proPhone,a1.billCode,a1.productName,a1.totalPrice,a1.isPayment
+        FROM smbms_bill a1,smbms_provider a2
+        WHERE a1.providerId=a2.id
+        AND a2.id=#{id}
+    </select>
+
+
+    <select id="getByLike" resultType="com.smbms.entity.Provider">
+         SELECT	* FROM smbms_provider
+         <trim prefix="where" prefixOverrides="and">
+             <if test="proCode != null">
+                proCode LIKE concat("%",#{proCode},"%")
+             </if>
+             <if test="proName != null">
+                 and proName LIKE concat("%",#{proName},"%")
+             </if>
+         </trim>
+    </select>
+
+    <select id="getByIds" resultType="com.smbms.entity.Bill">
+         SELECT * FROM smbms_bill
+         <trim prefix="where">
+                 providerId IN
+                 <foreach collection="param" item="param" open="(" close=")" separator=",">
+                    #{param}
+                 </foreach>
+         </trim>
+
+    </select>
+
+    <select id="getLimit" resultType="com.smbms.entity.Provider">
+        SELECT * FROM smbms_provider ORDER  BY creationDate DESC
+        LIMIT #{fromIndex},#{pageSize}
+    </select>
+
+
+    <select id="getByProCode" resultType="com.smbms.entity.Provider">
+        select * from smbms_provider where proCode=#{proCode};
+    </select>
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smbms.mapper.UserMapper">
+    <select id="get" resultType="com.smbms.entity.User">
+            SELECT	* FROM smbms_user
+            <trim prefix="where" prefixOverrides="and">
+                <if test="name!=null and name!=''">
+                    userCode=#{name}
+                </if>
+                <if test="password!=null and password!=''">
+                    and userPassword=#{password}
+                </if>
+            </trim>
+
+    </select>
+
+    <update id="Update">
+        update smbms_user set userPassword=#{userPassword}
+        where id=#{id}
+    </update>
+    <select id="getUserCode" resultType="com.smbms.entity.User">
+        select * from smbms_user where userCode=#{userCode}
+    </select>
+
+    <insert id="add">
+        insert into smbms_user(userCode, userName , userPassword ,  gender , birthday ,phone ,address ,userRole ,createdBy ,creationDate,idPicPath)
+        values (#{userCode},#{userName},#{userPassword},#{gender},#{birthday},#{phone},#{address},#{userRole},#{createdBy},#{creationDate},#{idPicPath})
+    </insert>
+
+    <select id="getCount" resultType="int">
+        SELECT COUNT(*) FROM smbms_user a1,smbms_role a2
+        <trim prefix="where" prefixOverrides="and">
+            a1.userRole=a2.id
+            <if test="queryname!=null and queryname!=''">
+                AND a1.userName LIKE concat("%",#{queryname},"%")
+            </if>
+
+            <if test="queryUserRole!=null and queryUserRole!='' and queryUserRole>0">
+                AND a1.userRole=#{queryUserRole}
+            </if>
+        </trim>
+    </select>
+
+    <select id="getlist" resultType="com.smbms.entity.User">
+        SELECT a1.*,a2.roleName FROM smbms_user a1,smbms_role a2
+        <trim prefix="where" prefixOverrides="and">
+            a1.userRole=a2.id
+            <if test="queryname!=null and queryname!=''">
+                AND a1.userName LIKE concat("%",#{queryname},"%")
+            </if>
+
+            <if test="queryUserRole!=null and queryUserRole!='' and queryUserRole>0">
+                AND a1.userRole=#{queryUserRole}
+            </if>
+        </trim>
+        limit #{PageNo},#{pageSize}
+    </select>
+
+
+    <select id="getById" resultType="com.smbms.entity.User">
+        SELECT a1.*,a2.roleName FROM smbms_user a1,smbms_role a2 WHERE a1.userRole=a2.id AND a1.id=#{uid}
+    </select>
+
+    <delete id="delUser">
+        delete from smbms_user where id=#{userid}
+    </delete>
+    <update id="update">
+        update smbms_user
+        <trim suffix="where id=#{id}" suffixOverrides="," prefix="set">
+        <if test="userCode!='' and userCode!=null">userCode=#{userCode},</if>
+        <if test="userName!='' and userName!=null">userName=#{userName},</if>
+        <if test="userPassword!='' and userPassword!=null">userPassword=#{userPassword},</if>
+        <if test="gender!='' and gender!=null">gender=#{gender},</if>
+        <if test="birthday!='' and birthday!=null">birthday=#{birthday},</if>
+        <if test="phone!='' and phone!=null">phone=#{phone},</if>
+        <if test="address!='' and address!=null">address=#{address},</if>
+        <if test="userRole!='' and userRole!=null">userRole=#{userRole},</if>
+        <if test="createdBy!='' and createdBy!=null">createdBy=#{createdBy},</if>
+        <if test="creationDate!='' and creationDate!=null">creationDate =#{creationDate },</if>
+        <if test="modifyBy!='' and modifyBy!=null">modifyBy=#{modifyBy}</if>
+        <if test="modifyBy!='' and modifyBy!=null">modifyBy=#{modifyDate}</if>
+        <if test="idPicPath!='' and idPicPath!=null">idPicPath=#{idPicPath}</if>
+</trim>
+    </update>
+</mapper>
